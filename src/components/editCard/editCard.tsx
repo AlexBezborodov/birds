@@ -14,6 +14,7 @@ import {Layout} from "../layout";
 export const EditCard = () => {
   const {id} = useParams();
   const navigate = useNavigate();
+
   const {fetchData, loading} = useFetch();
   const [editData, setEditData] = useState<Animal | null>(null);
   const isDisabled = !editData?.text || !editData?.title || !editData?.image;
@@ -23,6 +24,7 @@ export const EditCard = () => {
       setEditData(res.data);
     });
   };
+
   const onSave = () => {
     fetchData(`${BASIC_URL}${id}`, "PUT", editData).then((response: any) => {
       if (response.status === 200) {
@@ -30,26 +32,38 @@ export const EditCard = () => {
       }
     });
   };
+
   const onCreate = () => {
+    const newItemId = new Date().getTime();
+    console.log("newItemId", newItemId);
     const newItem = {
       ...editData,
-      id: new Date().getMilliseconds(),
-
-    }
-    fetchData(`${BASIC_URL}`, "POST", editData).then((response: any) => {
+      id: newItemId,
+      url: editData?.image,
+    };
+    fetchData(`${BASIC_URL}`, "POST", newItem).then((response: any) => {
+      console.log("Create resp", response);
       if (response.status === 200) {
         Alert.alert("Item successfully created");
       }
     });
   };
 
-  const updateValues = (name: string, value: string) => {
+  const inputHandler = (name: string, value: string) => {
     setEditData((prev: any) => ({...prev, [name]: value}));
   };
 
   const backAction = () => {
     navigate("/birds");
     setEditData(null);
+  };
+
+  const switchAction = () => {
+    if (id) {
+      onSave();
+    } else {
+      onCreate();
+    }
   };
 
   useEffect(() => {
@@ -74,7 +88,7 @@ export const EditCard = () => {
                     style={{backgroundColor: "transparent"}}
                     activeUnderlineColor="#26D826"
                     value={editData?.image || ""}
-                    onChangeText={text => updateValues("image", text)}
+                    onChangeText={text => inputHandler("image", text)}
                   />
                   <Box my={8}>
                     <TextInput
@@ -82,13 +96,13 @@ export const EditCard = () => {
                       style={{backgroundColor: "transparent"}}
                       activeUnderlineColor="#26D826"
                       value={editData?.title || ""}
-                      onChangeText={text => updateValues("title", text)}
+                      onChangeText={text => inputHandler("title", text)}
                     />
                   </Box>
                   <TextInput
                     label="Text"
                     style={{backgroundColor: "transparent"}}
-                    onChangeText={text => updateValues("text", text)}
+                    onChangeText={text => inputHandler("text", text)}
                     activeUnderlineColor="#26D826"
                     value={editData?.text || ""}
                   />
@@ -100,11 +114,11 @@ export const EditCard = () => {
               <Button
                 mode="elevated"
                 textColor="#fff"
-                onPress={onSave}
+                onPress={switchAction}
                 loading={loading}
                 disabled={Boolean(isDisabled)}
                 buttonColor={MD2Colors.blue300}>
-                Save
+                {id ? "Update" : "Create"}
               </Button>
             </Card.Actions>
           </Card>
