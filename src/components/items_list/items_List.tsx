@@ -4,6 +4,7 @@ import {ScrollView} from "react-native";
 
 import {BASIC_URL} from "../../constants";
 import {useFetch, useFilter} from "../../hooks";
+import {Animal} from "../../interfaces";
 import {Box} from "../box";
 import {CardDetails} from "../item_card";
 import {Loader} from "../loader";
@@ -14,7 +15,7 @@ interface ItemsListProps {
 
 export const ItemsList: FC<ItemsListProps> = ({query}) => {
   const {fetchData, loading} = useFetch();
-  const [data, setData] = useState<any>([]);
+  const [data, setData] = useState<Animal[]>([]);
 
   const filteredData = useFilter(data, query);
 
